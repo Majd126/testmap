@@ -1,317 +1,232 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Карта экологических катастроф России и СССР</title>
-    
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <title>Экологические катастрофы России и СССР</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: 'Inter', sans-serif;
-            background: #1a1a1a;
-            color: #ffffff;
-            overflow: hidden;
-        }
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-        #map {
-            height: 100%;
-            width: 100%;
-            z-index: 1;
-        }
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-        /* Контейнер интерфейса */
-        .ui-container {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 800px;
-            z-index: 1000;
-            background: rgba(20, 20, 20, 0.85);
-            backdrop-filter: blur(10px);
-            padding: 20px 30px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+    }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    #map {
+      height: 100%;
+      width: 100%;
+    }
 
-        h1 {
-            margin: 0;
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #ff4d4d;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+    .header {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(10px);
+      padding: 16px 24px;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      text-align: center;
+    }
 
-        .year-display {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #fff;
-            text-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
-            font-feature-settings: "tnum";
-            font-variant-numeric: tabular-nums;
-        }
+    .header h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+    }
 
-        /* Стиль слайдера */
-        input[type=range] {
-            -webkit-appearance: none;
-            width: 100%;
-            background: transparent;
-        }
+    .header p {
+      margin: 6px 0 0;
+      font-size: 13px;
+      color: #cbd5f5;
+    }
 
-        input[type=range]:focus {
-            outline: none;
-        }
+    .timeline {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      width: 80%;
+      max-width: 900px;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(12px);
+      padding: 18px 24px;
+      border-radius: 18px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.45);
+    }
 
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 6px;
-            cursor: pointer;
-            background: #444;
-            border-radius: 3px;
-        }
+    .timeline-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 10px;
+      color: #e0e7ff;
+    }
 
-        input[type=range]::-webkit-slider-thumb {
-            height: 24px;
-            width: 24px;
-            border-radius: 50%;
-            background: #ff4d4d;
-            cursor: pointer;
-            -webkit-appearance: none;
-            margin-top: -9px;
-            box-shadow: 0 0 10px rgba(255, 77, 77, 0.8);
-            border: 2px solid #fff;
-            transition: transform 0.1s;
-        }
+    input[type=range] {
+      width: 100%;
+      appearance: none;
+      height: 6px;
+      border-radius: 6px;
+      background: linear-gradient(to right, #22c55e, #ef4444);
+      outline: none;
+    }
 
-        input[type=range]::-webkit-slider-thumb:hover {
-            transform: scale(1.1);
-        }
+    input[type=range]::-webkit-slider-thumb {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #e5e7eb;
+      cursor: pointer;
+      border: 3px solid #020617;
+    }
 
-        /* Стили попапов */
-        .leaflet-popup-content-wrapper {
-            background: rgba(30, 30, 30, 0.95);
-            color: #fff;
-            border-radius: 8px;
-            border: 1px solid #444;
-        }
+    .leaflet-popup-content-wrapper {
+      background: #020617;
+      color: #e5e7eb;
+      border-radius: 14px;
+    }
 
-        .leaflet-popup-tip {
-            background: rgba(30, 30, 30, 0.95);
-        }
+    .leaflet-popup-content {
+      margin: 14px;
+      max-width: 260px;
+    }
 
-        .popup-content h3 {
-            margin: 0 0 10px 0;
-            color: #ff4d4d;
-            font-size: 1.1rem;
-        }
+    .popup-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
 
-        .popup-info {
-            font-size: 0.9rem;
-            margin-bottom: 8px;
-            line-height: 1.4;
-        }
+    .popup-img {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
 
-        .popup-meta {
-            font-size: 0.85rem;
-            color: #aaa;
-            margin-bottom: 10px;
-            display: flex;
-            gap: 15px;
-        }
+    .popup-desc {
+      font-size: 13px;
+      line-height: 1.4;
+      margin-bottom: 8px;
+      color: #cbd5f5;
+    }
 
-        .popup-meta span strong {
-            color: #fff;
-        }
-
-        .popup-img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 6px;
-            margin-top: 10px;
-            background: #222;
-        }
-
-        /* Легенда / Статус */
-        #status-msg {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            background: rgba(0,0,0,0.7);
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            pointer-events: none;
-        }
-    </style>
+    .popup-deaths {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fca5a5;
+    }
+  </style>
 </head>
 <body>
 
-    <div id="map"></div>
-    <div id="status-msg">Загрузка данных...</div>
+<div class="header">
+  <h1>Экологические катастрофы России и СССР</h1>
+  <p>Интерактивная историческая карта (1900–2025)</p>
+</div>
 
-    <div class="ui-container">
-        <div class="header">
-            <h1>Экологические катастрофы</h1>
-            <div class="year-display" id="current-year">1900</div>
-        </div>
-        <input type="range" id="time-slider" min="1900" max="2025" value="2025" step="1">
-        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #888;">
-            <span>1900</span>
-            <span>2025</span>
-        </div>
-    </div>
+<div id="map"></div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+<div class="timeline">
+  <div class="timeline-label">
+    <span>1900</span>
+    <strong id="yearLabel">1950</strong>
+    <span>2025</span>
+  </div>
+  <input type="range" id="yearSlider" min="1900" max="2025" value="1950" />
+</div>
 
-    <script>
-        // --- 1. Инициализация карты ---
-        // Центр на Россию, темная тема
-        const map = L.map('map', {
-            zoomControl: false,
-            minZoom: 2
-        }).setView([60.0, 90.0], 3);
+<script>
+  const map = L.map('map', {
+    zoomControl: false
+  }).setView([60, 90], 3);
 
-        L.control.zoom({ position: 'topleft' }).addTo(map);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
 
-        // Используем CartoDB Dark Matter для "современного" вида
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-            subdomains: 'abcd',
-            maxZoom: 19
-        }).addTo(map);
+  L.control.zoom({ position: 'topright' }).addTo(map);
 
-        // --- 2. Логика данных ---
-        const DATA_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRA23xJcb9bXUFBwOuFKuu9_umXwFN7OKIHVYZw21vC_2-FU16EnyK3Ud2sqmI3_S3hDfuf5uGSEqoO/pub?output=xlsx";
-        let allEvents = [];
-        let markersLayer = L.layerGroup().addTo(map);
+  const sheetCSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR6xAxobArUvYDVcdcea0t8qbBfVi-6ab9Yq75_UIFpvRR8whcdf0mD-rlGkVYBAegKj-olczNhmF5E/pub?output=csv';
 
-        const slider = document.getElementById('time-slider');
-        const yearDisplay = document.getElementById('current-year');
-        const statusMsg = document.getElementById('status-msg');
+  let allData = [];
+  let markers = [];
 
-        // Функция для расчета радиуса круга в зависимости от жертв
-        function getRadius(deathToll) {
-            const deaths = parseInt(deathToll) || 0;
-            // Базовый размер 5px + логарифмическая шкала.
-            // Если жертв 0 или нет данных, будет маленький круг.
-            // Если 1000 жертв -> ~15-20px
-            if (deaths <= 0) return 60000; // Примерный радиус в метрах для карты
-            // Leaflet Circle использует метры. Нам нужно адаптировать под зум или использовать CircleMarker (пиксели).
-            // Используем CircleMarker для фиксированного размера в пикселях.
-            return 6 + Math.sqrt(deaths) * 0.8; 
-        }
+  function radiusFromDeaths(deaths) {
+    if (!deaths || deaths <= 0) return 6;
+    return Math.min(40, 6 + Math.sqrt(deaths) / 5);
+  }
 
-        function getColor(deathToll) {
-            const deaths = parseInt(deathToll) || 0;
-            if (deaths > 1000) return '#ff0000'; // Крупные - ярко красные
-            if (deaths > 100) return '#ff4d4d';  // Средние
-            return '#ff8c00';                    // Мелкие - оранжевые
-        }
+  function render(year) {
+    markers.forEach(m => map.removeLayer(m));
+    markers = [];
 
-        // Загрузка данных
-        async function loadData() {
-            try {
-                const response = await fetch(DATA_URL);
-                if (!response.ok) throw new Error("Ошибка сети");
-                
-                const arrayBuffer = await response.arrayBuffer();
-                const workbook = XLSX.read(arrayBuffer);
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                
-                // Преобразуем в JSON массив
-                const rawData = XLSX.utils.sheet_to_json(worksheet);
-                
-                // Нормализация данных (убираем пустые, приводим типы)
-                allEvents = rawData.map(row => ({
-                    title: row.Title || "Без названия",
-                    year: parseInt(row.Year) || 1900,
-                    lat: parseFloat(row.Lat),
-                    lng: parseFloat(row.Lng),
-                    desc: row.Description || "",
-                    img: row.ImageURL || "",
-                    deaths: row.DeathToll
-                })).filter(e => !isNaN(e.lat) && !isNaN(e.lng)); // Оставляем только с координатами
-
-                statusMsg.style.display = 'none';
-                updateMap(parseInt(slider.value));
-
-            } catch (error) {
-                console.error(error);
-                statusMsg.innerText = "Ошибка загрузки данных. Проверьте CORS или ссылку.";
-                statusMsg.style.background = "#ff4d4d";
-            }
-        }
-
-        // Обновление карты
-        function updateMap(selectedYear) {
-            markersLayer.clearLayers();
-            
-            // Интегративная логика: показываем всё, что случилось <= selectedYear
-            const filteredEvents = allEvents.filter(e => e.year <= selectedYear);
-
-            filteredEvents.forEach(e => {
-                const radius = getRadius(e.deaths);
-                const color = getColor(e.deaths);
-
-                const marker = L.circleMarker([e.lat, e.lng], {
-                    radius: radius,
-                    fillColor: color,
-                    color: "#fff",
-                    weight: 1,
-                    opacity: 1,
-                    fillOpacity: 0.7
-                });
-
-                // Формирование HTML для попапа
-                let popupHtml = `
-                    <div class="popup-content">
-                        <h3>${e.title}</h3>
-                        <div class="popup-meta">
-                            <span>Год: <strong>${e.year}</strong></span>
-                            <span>Погибших: <strong>${e.deaths || 'Н/Д'}</strong></span>
-                        </div>
-                        <div class="popup-info">${e.desc}</div>
-                        ${e.img ? `<img src="${e.img}" class="popup-img" alt="${e.title}" onerror="this.style.display='none'">` : ''}
-                    </div>
-                `;
-
-                marker.bindPopup(popupHtml);
-                markersLayer.addLayer(marker);
-            });
-        }
-
-        // --- 3. Слушатели событий ---
-        slider.addEventListener('input', (e) => {
-            const year = parseInt(e.target.value);
-            yearDisplay.innerText = year;
-            updateMap(year);
+    allData
+      .filter(item => item.Year <= year)
+      .forEach(item => {
+        const circle = L.circleMarker([item.Lat, item.Lng], {
+          radius: radiusFromDeaths(item.DeathToll),
+          color: '#7f1d1d',
+          fillColor: '#ef4444',
+          fillOpacity: 0.75,
+          weight: 1
         });
 
-        // Запуск
-        loadData();
+        const popup = `
+          <div class="popup-title">${item.Title}</div>
+          ${item.Image ? `<img class="popup-img" src="${item.Image}" />` : ''}
+          <div class="popup-desc">${item.Description || ''}</div>
+          <div class="popup-deaths">Погибших: ${item.DeathToll || 'нет данных'}</div>
+        `;
 
-    </script>
+        circle.bindPopup(popup);
+        circle.addTo(map);
+        markers.push(circle);
+      });
+  }
+
+  fetch(sheetCSV)
+    .then(res => res.text())
+    .then(text => {
+      const rows = text.split('\n').slice(1);
+      allData = rows.map(r => {
+        const cols = r.split(',');
+        return {
+          Title: cols[0],
+          Year: parseInt(cols[1]),
+          Lat: parseFloat(cols[2]),
+          Lng: parseFloat(cols[3]),
+          Description: cols[4],
+          Image: cols[5],
+          URL: cols[6],
+          DeathToll: parseInt(cols[7])
+        };
+      }).filter(r => !isNaN(r.Lat) && !isNaN(r.Lng));
+
+      render(1950);
+    });
+
+  const slider = document.getElementById('yearSlider');
+  const label = document.getElementById('yearLabel');
+
+  slider.addEventListener('input', () => {
+    label.textContent = slider.value;
+    render(parseInt(slider.value));
+  });
+</script>
+
 </body>
 </html>
